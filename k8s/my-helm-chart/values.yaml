@@ -1,0 +1,112 @@
+# Default values for my-helm-chart.
+
+# Replicas for StatefulSet
+replicaCount: 3  # Recommended: 3 for high availability
+
+# Container Image
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: ""
+
+# Image Pull Secrets (if using a private repository)
+imagePullSecrets: []
+
+# Name overrides
+nameOverride: ""
+fullnameOverride: ""
+
+# Service Account settings
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# Pod Annotations & Labels
+podAnnotations: {}
+podLabels: {}
+
+# Pod Security
+podSecurityContext: {}
+securityContext: {}
+
+# Service settings
+service:
+  name: my-stateful-service
+  type: ClusterIP
+  port: 80
+
+# Ingress settings
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+# Resource Limits (Recommended for StatefulSets)
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+# Liveness and Readiness Probes (Ensure app stability)
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 5
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+# Autoscaling (StatefulSets usually don't scale dynamically)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+# Persistent Storage Configuration
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+  storageClass: ""
+
+# Volumes
+volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: my-pvc
+
+# Volume Mounts
+volumeMounts:
+  - name: data
+    mountPath: /data
+
+# Node and Toleration settings
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Vault integration
+vault:
+  enabled: true
+  path: "secret/my-app"
+  auth:
+    role: "my-app"
+    method: "kubernetes"
